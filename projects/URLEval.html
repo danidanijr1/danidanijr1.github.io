@@ -6,6 +6,5 @@ function getUrlVars() {
     });
     return vars;
 }
-document.body.innerHTML = eval(decodeURI(getUrlVars()['i']))
+document.write(eval(decodeURI(getUrlVars()['i'])))
 </script>
-<body onload="document.body.innerHTML = eval(decodeURI(getUrlVars()['i']))">
