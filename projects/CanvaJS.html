@@ -1,0 +1,313 @@
+<style>
+body {
+    background-color: #ABCDEF;
+	font-family: Consolas
+}
+button {
+	font-size: 30px;
+	font-family: Consolas
+}
+canvas {
+	border:1px solid #000000;
+	position:absolute; right:8px;
+}
+textarea {
+	resize: none;
+	font-size: 16px;
+	background-color: #000000;
+	color: #FFFFFF
+}
+</style>
+
+
+<label>Version: v0.1.2.0</label>
+<br>
+
+<label for="examples">Choose an example:</label>
+
+<select id="examples">
+  <option>Basic</option>
+  <option>Random boxes</option>
+  <option>Get image from URL</option>
+  <option>Mouse</option>
+</select>
+<button style="font-size: 14px" onClick="loadEx()">Load</button>
+<br>
+<canvas id="canvas" onmousemove="getPos(event)" onmousedown="mouseDown = true" onmouseup="mouseDown = false"></canvas>
+<textarea id="textarea" rows=15 cols=80></textarea>
+<br>
+<br>
+<label style="font-size: 20px">-------- Errors --------</label>
+<button style="font-size: 14px" onClick="$('errors').value = Date.now() + ' - Cleared errors.'">Clear Errors</button>
+
+<br>
+<textarea id="errors" rows=10 cols=80 readonly=true style="color: #FF8888">Errors will show up here.
+</textarea>
+
+
+
+<br>
+<p id="runningText" style="color: red; font-size: 24px"></p>
+<button onClick="start()">Start</button>
+<button onClick="stop()">Stop</button>
+<button onClick="pause()">Pause</button>
+
+</p>
+<div style="white-space: pre; font-size: 20px">
+Variables:
+tick, mouseX, mouseY, mouseDown
+
+Functions:
+canvas.
+	width()
+	height()
+	rect(x, y, width, height, color)
+	rectTo(x, y, x2, y2, color)
+	pixel(x, y, color)
+	setSize(width, height)
+	text(x, y, text, color, px, font)
+	get(x, y, width, height)
+	getColor(x, y)
+	paste(x, y, imgData)
+	clear()
+	circle(x, y, size, color, borderColor, width, percent)
+	drawImg(img, x, y, width, height)
+	drawImgURL(imgURL, x, y, width, height)
+
+random()
+floor(n)
+hex(n)
+play(audioURL)
+</div>
+
+<script>
+isRunning = false
+isPaused = false
+tick = 0
+interval = undefined
+
+
+examplesText = [
+`function onStart() {
+    canvas.setSize(400, 400);
+}
+function onLoop() {
+    
+}`,
+
+`function onStart() {
+    canvas.setSize(400, 400);
+}
+function onLoop() {
+    canvas.rect(random()*200, random()*200, random()*200, random()*200, '#'+hex(floor(random()*256*256*256)))
+}`,
+
+`function onStart() {
+    canvas.setSize(256, 256);
+}
+function onLoop() {
+	canvas.drawImgURL("https://cdn.discordapp.com/attachments/480445049843220483/916509403753119764/ib3zPwAUA7BxC5f2nSAAAAAElFTkSuQmCC.png", 0, 0, 256, 256);
+}`,
+
+`function onStart() {
+    canvas.setSize(400, 400);
+}
+function onLoop() {
+    canvas.clear();
+    canvas.circle(mouseX, mouseY, 15 + (mouseDown * 15))
+}`
+]
+
+
+
+
+
+
+
+
+
+
+function loadEx() {
+stop()
+let val = examplesText[$('examples').options.selectedIndex]
+$('textarea').value = val
+}
+$('textarea').value = examplesText[0]
+
+
+function $(e) {
+    return document.getElementById(e)
+}
+
+
+function getPos(event) {
+    mouseX = event.offsetX;
+	mouseY = event.offsetY;
+}
+
+
+canvas = {
+	"width": ()=>{
+		return $('canvas').width
+	},
+	"height": ()=>{
+		return $('canvas').height
+	},
+	"rect": (x, y, width, height, color = '#FF0000')=>{
+		var Canvas = document.querySelector("canvas");
+		var ctx = Canvas.getContext('2d')
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, width, height)
+	},
+	"rectTo": (x, y, x2, y2, color = '#FF0000')=>{
+		var Canvas = document.querySelector("canvas");
+		var ctx = Canvas.getContext('2d')
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, x2-x, y2-y)
+	},
+	"fill": (color = "#000000")=>{
+		canvas.rect(0, 0, canvas.width(), canvas.height(), color)
+	},
+	"pixel": (x, y, color = '#FF0000')=>{
+		var Canvas = document.querySelector("canvas");
+		var ctx = Canvas.getContext('2d')
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, 1, 1)
+	},
+	"setSize": (widthh, heightt)=>{
+		$('canvas').width = widthh;
+		$('canvas').height = heightt;
+	},
+	"text": (x, y, text = 'Hello World!', color = '#0000FF', px = 24, font = 'serif')=>{
+		var ctx = document.getElementById('canvas').getContext('2d');
+		ctx.font = px + 'px ' + font;
+		ctx.fillStyle = color;
+		ctx.fillText(text, x, y)
+	},
+	"get": (x, y, width = 1, height = 1)=>{
+		var Canvas = document.querySelector("canvas");
+		var ctx = Canvas.getContext('2d')
+		return ctx.getImageData(x, y, width, height)
+	},
+	"getColor": (x, y)=>{
+		var Canvas = document.querySelector("canvas");
+		var ctx = Canvas.getContext('2d')
+		var c = ctx.getImageData(x, y, 1, 1)
+		return '#' + c.data[0].toString(16).padStart(2, 0) + c.data[1].toString(16).padStart(2, 0) + c.data[2].toString(16).padStart(2, 0) + c.data[3].toString(16).padStart(2, 0)
+	},
+	"paste": (x, y, imgData)=>{
+		var Canvas = document.querySelector("canvas");
+		var ctx = Canvas.getContext('2d')
+		ctx.putImageData(imgData, x, y);
+	},
+	"clear": ()=>{
+		canvas.setSize($('canvas').width, $('canvas').height)
+	},
+	"circle": (x, y, size = 5, color = '#00FF00', borderColor = "#00000000", width = 5, percent = 1)=>{
+		var Canvas = document.querySelector('canvas');
+		var ctx = Canvas.getContext('2d');
+		ctx.beginPath();
+		ctx.arc(x,y,size,0,(2*Math.PI)*percent, false);
+		ctx.fillStyle = color;
+		ctx.fill();
+		ctx.lineWidth = width;
+		ctx.strokeStyle = borderColor;
+		ctx.stroke();
+	},
+	"drawImg": (img, x, y, width, height)=>{
+		var ctx = document.getElementById('canvas').getContext('2d');
+		ctx.drawImage(img, x, y, width, height);
+	},
+	"drawImgURL": (imgURL, x = 0, y = 0, width = 32, height = 32)=>{
+	    var img = new Image
+		img.src = imgURL
+		var ctx = document.getElementById('canvas').getContext('2d');
+		ctx.drawImage(img, x, y, width, height);
+	},
+}
+
+
+function updateText() {
+	if (isRunning) {
+	$('runningText').innerHTML = `Running for ${tick} ticks`
+	$('runningText').style.color = 'green'
+	} else { 
+	$('runningText').innerHTML = 'Not Running'
+	$('runningText').style.color = 'red'
+		if (isPaused) {
+				$('runningText').innerHTML = `Paused - ${tick} ticks`
+				$('runningText').style.color = 'yellow'
+		}
+	}
+}
+
+
+function random() {
+	return Math.random()
+}
+function hex(n) {
+    return (n).toString(16)
+}
+function floor(n) {
+    return Math.floor(n)
+}
+function play(audioURL) {
+	let aAudio = new Audio(audioURL);
+	aAudio.play()
+}
+
+
+
+
+
+
+
+
+function start(before = true) {
+	if (!(isRunning || isPaused)) {
+		isRunning = true
+		updateText()
+		if (before) {
+			try {
+				mouseDown = false
+				mouseX = 0
+				mouseY = 0
+				eval($('textarea').value + '\nonStart()')
+			} catch (e) {
+				$('errors').value = Date.now() + ' - ' + ('onStart: ' + e + '\n') + $('errors').value
+			}
+		}
+		interval = setInterval(()=>{
+			try {
+				eval($('textarea').value + '\nonLoop()')
+				tick++
+				updateText()
+			} catch (e) {
+				$('errors').value = Date.now() + ' - ' + ('onLoop: ' + e + '\n') + $('errors').value
+			}
+		}, 33)
+	}
+}
+
+function stop() {
+	clearInterval(interval)
+	isRunning = false
+	isPaused = false
+	tick = 0
+	updateText()
+}
+
+function pause() {
+	if (isPaused) {
+		isPaused = false
+		start(false)
+	} else {
+		isPaused = true
+		clearInterval(interval)
+		isRunning = false
+	}
+	updateText()
+}
+
+updateText()
+</script>
