@@ -20,7 +20,7 @@ textarea {
 </style>
 
 
-<label>Version: v0.1.4.0</label>
+<label>Version: v0.3.0.0</label>
 <br>
 
 <label for="examples">Choose an example:</label>
@@ -30,6 +30,7 @@ textarea {
   <option>Random boxes</option>
   <option>Get image from URL</option>
   <option>Mouse</option>
+  <option>Button</option>
 </select>
 <button style="font-size: 14px" onClick="loadEx()">Load</button>
 <br>
@@ -51,9 +52,18 @@ textarea {
 <button onClick="start()">Start</button>
 <button onClick="stop()">Stop</button>
 <button onClick="pause()">Pause</button>
+<br>
+<label>Speed:</label>
+<input type="number" id="Speed" min="1" max="1000"><label>x</label>
+<br>
+<label>FPS:</label>
+<input type="number" id="FPS" min="0.1">
+<button style="font-size: 14px" onClick="FPSSET()">Set FPS</button>
 
-</p>
+
 <div style="white-space: pre; font-size: 20px">
+* = Required
+
 Variables:
 tick, mouseX, mouseY, mouseDown
 
@@ -73,16 +83,26 @@ canvas.
 	circle(x, y, size, color, borderColor, width, percent)
 	drawImg(img, x, y, width, height)
 	drawImgURL(imgURL, x, y, width, height)
+	button.
+		add(x, y, width, height, color, text, font, onmousedown, onmouseup, onclick, *id)
+		del(id)
+		delAll()
+		get(id)
+		getAll()
 
 random()
 floor(n)
 hex(n)
 play(audioURL)
 color(n)
+beetween(x, y, z)
+setFPS(fps)
+setSpeed(speedX)
 </div>
 
 <script>
 isRunning = false
+isStopped = false
 isPaused = false
 tick = 0
 interval = undefined
@@ -116,14 +136,32 @@ function onLoop() {
 function onLoop() {
     canvas.clear();
     canvas.circle(mouseX, mouseY, 15 + (mouseDown * 15))
+}`,
+
+`function onStart() {
+    canvas.setSize(400, 400);
+    canvas.button.add(5, 5, 140, 20, '#AABBCC', 'add rnd rect', 'Consolas', ()=>{}, ()=>{}, ()=>{canvas.rect(random()*200, random()*200, random()*200, random()*200, '#'+hex(floor(random()*256*256*256)))}, 1)
+}
+function onLoop() {
+    
 }`
 ]
 
 
 
 
-
-
+function setFPS(fps) {
+	$('FPS').value = fps
+}
+function setSpeed(speedX) {
+	$('Speed').value = speedX
+}
+function FPSSET() {
+	clearInterval(interval)
+	isRunning = false
+	isStopped = true
+	start(false)
+}
 
 
 
@@ -179,7 +217,7 @@ canvas = {
 		$('canvas').width = widthh;
 		$('canvas').height = heightt;
 	},
-	"text": (x, y, text = 'Hello World!', color = '#0000FF', px = 24, font = 'serif')=>{
+	"text": (x, y, text = 'Hello World!', color = '#0000FF', px = 24, font = 'Consolas')=>{
 		var ctx = document.getElementById('canvas').getContext('2d');
 		ctx.font = px + 'px ' + font;
 		ctx.fillStyle = color;
@@ -215,17 +253,73 @@ canvas = {
 		ctx.strokeStyle = borderColor;
 		ctx.stroke();
 	},
-	"drawImg": (img, x, y, width, height)=>{
+	"drawImg": (img, x, y, width = 32, height = 32)=>{
 		var ctx = document.getElementById('canvas').getContext('2d');
 		ctx.drawImage(img, x, y, width, height);
 	},
-	"drawImgURL": (imgURL, x = 0, y = 0, width = 32, height = 32)=>{
+	"drawImgURL": (imgURL, x, y, width = 32, height = 32)=>{
 	    var img = new Image
 		img.src = imgURL
 		var ctx = document.getElementById('canvas').getContext('2d');
 		ctx.drawImage(img, x, y, width, height);
 	},
+	"button": {
+		"add": (x, y, width = 50, height = 50, color = "#FEDCBA", text = "Button", font = 'Consolas', onmousedown, onmouseup, onclick, id)=>{
+			if (id != undefined) {
+				Buttons.push({"x": x, "y": y, "width": width, "height": height, "color": color, "text": text, "font": font, "onmousedown": onmousedown, "onmouseup": onmouseup, "onclick": onclick, "id": id, "isClicked": false})
+			}
+		},
+		"del": (id)=>{
+			Buttons.pop(Buttons.filter((It)=>{return It.id == id}))
+		},
+		"delAll": ()=>{
+			Buttons = []
+		},
+		"get": (id)=>{
+			return Buttons.filter((It)=>{return It.id == id})
+		},
+		"getAll": (id)=>{
+			return Buttons
+		},
+	}
 }
+
+
+function renderButtons() {
+	var I = 0
+	for (var Item of Buttons) {
+	var isMouseDown = false
+		if (beetween(Item.x, mouseX, Item.x + Item.width) && beetween(Item.y, mouseY, Item.y + Item.height)) {
+			if (mouseDown) {
+				Item.onmousedown()
+				isMouseDown = true
+			}
+		}
+		if (!isMouseDown) {
+			Item.onmouseup()
+		}
+		if (Buttons[I].isClicked == false) {
+			if (isMouseDown) {
+				Buttons[I].isClicked = true
+				Item.onclick()
+			}
+		} else {
+			Buttons[I].isClicked = true
+			if (!isMouseDown) {
+				Buttons[I].isClicked  = false
+			}
+		}
+		canvas.rect(Item.x, Item.y, Item.width, Item.height, Item.color)
+		var ctx = document.getElementById('canvas').getContext('2d');
+		ctx.font = 20 + 'px ' + Item.font;
+		ctx.fillStyle = '#888888';
+		ctx.textAlign = "center";
+		ctx.fillText(Item.text, Item.x + Item.width/2, (Item.y + Item.height/2) + (20/4) + isMouseDown*2)
+		I++
+	}
+}
+
+
 
 
 function updateText() {
@@ -259,36 +353,46 @@ function play(audioURL) {
 function color(n) {
 	return '#'+(floor(n)%16777216).toString(16).padStart(6, 0)
 }
+function beetween(x, y, z) {
+	return x>z?(y>=z&&y<=x):(y>=x&&y<=z)
+}
 
 
-
-
-
-
+function setupVars() {
+	mouseDown = false
+	mouseX = 0
+	mouseY = 0
+	Buttons = []
+}
 
 function start(before = true) {
 	if (!(isRunning || isPaused)) {
 		isRunning = true
+		isStopped = false
 		updateText()
 		if (before) {
 			try {
-				mouseDown = false
-				mouseX = 0
-				mouseY = 0
+				setupVars()
 				eval($('textarea').value + '\nonStart()')
+				renderButtons()
 			} catch (e) {
-				$('errors').value = Date.now() + ' - ' + ('onStart: ' + e + '\n') + $('errors').value
+				$('errors').value = Date.now() + ' - ' + ('onStart: ' + e + '\n') + $('errors').value;
+				renderButtons();
 			}
 		}
 		interval = setInterval(()=>{
+		for (var i = 0; i < Number($('Speed').value); i++) {
 			try {
 				eval($('textarea').value + '\nonLoop()')
+				renderButtons()
 				tick++
 				updateText()
 			} catch (e) {
 				$('errors').value = Date.now() + ' - ' + ('onLoop: ' + e + '\n') + $('errors').value
+				renderButtons()
 			}
-		}, 1000/60)
+		}
+		}, 1000/$('FPS').value)
 	}
 }
 
@@ -296,6 +400,7 @@ function stop() {
 	clearInterval(interval)
 	isRunning = false
 	isPaused = false
+	isStopped = true
 	tick = 0
 	updateText()
 }
@@ -303,7 +408,9 @@ function stop() {
 function pause() {
 	if (isPaused) {
 		isPaused = false
-		start(false)
+		if (!isStopped) {
+			start(false)
+		}
 	} else {
 		isPaused = true
 		clearInterval(interval)
@@ -313,4 +420,6 @@ function pause() {
 }
 
 updateText()
+$('Speed').value = 1
+$('FPS').value = 60
 </script>
