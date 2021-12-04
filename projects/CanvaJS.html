@@ -20,7 +20,7 @@ textarea {
 </style>
 
 
-<label>Version: v0.3.0.1</label>
+<label>Version: v0.3.1.0</label>
 <br>
 
 <label for="examples">Choose an example:</label>
@@ -84,7 +84,7 @@ canvas.
 	drawImg(img, x, y, width, height)
 	drawImgURL(imgURL, x, y, width, height)
 	button.
-		add(x, y, width, height, color, text, font, onmousedown, onmouseup, onclick, *id)
+		add(x, y, width, height, color, text, font, px, onmousedown, onmouseup, onclick, *id)
 		del(id)
 		delAll()
 		get(id)
@@ -140,7 +140,7 @@ function onLoop() {
 
 `function onStart() {
     canvas.setSize(400, 400);
-    canvas.button.add(5, 5, 140, 20, '#AABBCC', 'add rnd rect', 'Consolas', ()=>{}, ()=>{}, ()=>{canvas.rect(random()*200, random()*200, random()*200, random()*200, '#'+hex(floor(random()*256*256*256)))}, 1)
+    canvas.button.add(5, 5, 140, 20, '#AABBCC', 'add rnd rect', 'Consolas', 24, ()=>{}, ()=>{}, ()=>{canvas.rect(random()*200, random()*200, random()*200, random()*200, '#'+hex(floor(random()*256*256*256)))}, 1)
 }
 function onLoop() {
     
@@ -265,9 +265,9 @@ canvas = {
 		ctx.drawImage(img, x, y, width, height);
 	},
 	"button": {
-		"add": (x, y, width = 50, height = 50, color = "#FEDCBA", text = "Button", font = 'Consolas', onmousedown, onmouseup, onclick, id)=>{
+		"add": (x, y, width = 50, height = 50, color = "#FEDCBA", text = "Button", font = 'Consolas', px = 24, onmousedown, onmouseup, onclick, id)=>{
 			if (id != undefined) {
-				Buttons.push({"x": x, "y": y, "width": width, "height": height, "color": color, "text": text, "font": font, "onmousedown": onmousedown, "onmouseup": onmouseup, "onclick": onclick, "id": id, "isClicked": false})
+				Buttons.push({"x": x, "y": y, "width": width, "height": height, "color": color, "text": text, "font": font, "px": px, "onmousedown": onmousedown, "onmouseup": onmouseup, "onclick": onclick, "id": id, "isClicked": false})
 			}
 		},
 		"del": (id)=>{
@@ -312,7 +312,7 @@ function renderButtons() {
 		}
 		canvas.rect(Item.x, Item.y, Item.width, Item.height, Item.color)
 		var ctx = document.getElementById('canvas').getContext('2d');
-		ctx.font = 20 + 'px ' + Item.font;
+		ctx.font = Item.px + 'px ' + Item.font;
 		ctx.fillStyle = '#888888';
 		ctx.textAlign = "center";
 		ctx.fillText(Item.text, Item.x + Item.width/2, (Item.y + Item.height/2) + (20/4) + isMouseDown*2)
