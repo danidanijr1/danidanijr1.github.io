@@ -20,7 +20,7 @@ textarea {
 </style>
 
 
-<label>Version: v0.3.2.0</label>
+<label>Version: v0.3.2.1</label>
 <br>
 
 <label for="examples">Choose an example:</label>
@@ -140,7 +140,7 @@ function onLoop() {
 
 `function onStart() {
     canvas.setSize(400, 400);
-    canvas.button.add(5, 5, 140, 20, '#AABBCC', 'add rnd rect', 'Consolas', 24, ()=>{}, ()=>{}, ()=>{canvas.rect(random()*200, random()*200, random()*200, random()*200, '#'+hex(floor(random()*256*256*256)))}, 1)
+    canvas.button.add(5, 5, 140, 20, '#AABBCC', '#FFFFFF', 'add rnd rect', 'Consolas', 24, ()=>{}, ()=>{}, ()=>{canvas.rect(random()*200, random()*200, random()*200, random()*200, '#'+hex(floor(random()*256*256*256)))}, 1)
 }
 function onLoop() {
     
