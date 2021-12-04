@@ -20,7 +20,7 @@ textarea {
 </style>
 
 
-<label>Version: v0.3.0.0</label>
+<label>Version: v0.3.0.1</label>
 <br>
 
 <label for="examples">Choose an example:</label>
@@ -152,6 +152,7 @@ function onLoop() {
 
 function setFPS(fps) {
 	$('FPS').value = fps
+	FPSSET()
 }
 function setSpeed(speedX) {
 	$('Speed').value = speedX
