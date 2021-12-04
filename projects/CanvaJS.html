@@ -20,7 +20,7 @@ textarea {
 </style>
 
 
-<label>Version: v0.1.2.0</label>
+<label>Version: v0.1.2.1</label>
 <br>
 
 <label for="examples">Choose an example:</label>
@@ -68,7 +68,7 @@ canvas.
 	text(x, y, text, color, px, font)
 	get(x, y, width, height)
 	getColor(x, y)
-	paste(x, y, imgData)
+	paste(imgData, x, y)
 	clear()
 	circle(x, y, size, color, borderColor, width, percent)
 	drawImg(img, x, y, width, height)
@@ -195,7 +195,7 @@ canvas = {
 		var c = ctx.getImageData(x, y, 1, 1)
 		return '#' + c.data[0].toString(16).padStart(2, 0) + c.data[1].toString(16).padStart(2, 0) + c.data[2].toString(16).padStart(2, 0) + c.data[3].toString(16).padStart(2, 0)
 	},
-	"paste": (x, y, imgData)=>{
+	"paste": (imgData, x, y)=>{
 		var Canvas = document.querySelector("canvas");
 		var ctx = Canvas.getContext('2d')
 		ctx.putImageData(imgData, x, y);
