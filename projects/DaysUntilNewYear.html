@@ -1,0 +1,96 @@
+<style>
+body {
+    font-family: Consolas;
+}
+body {
+    background-color: black;
+    color: white;
+    text-align: center;
+    background-image: url("https://media.discordapp.net/attachments/925417783326568468/925417825387053106/de6cty8-fcad9a22-754b-44bb-9e22-da62dc45daf5.jpg"); /* why not! Changed background ^w^ */
+    background-color: rgba(0,0,0,0.98);
+    background-blend-mode: darken;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.blue {
+    color: #22D;
+}
+.big {
+    font-size: 80px
+}
+.mono {
+    font-family: monospace
+}
+.neonText2 {
+  color: #fff;
+  text-shadow:
+    0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px #0fa,
+    0 0 82px #0fa;
+}
+@keyframes pulsate {
+  100% {
+    /* Larger blur radius */
+    text-shadow:
+      0 0 4px #fff,
+      0 0 11px #fff,
+      0 0 19px #fff,
+      0 0 40px #0fa,
+      0 0 80px #0fa,
+      0 0 90px #0fa,
+      0 0 100px #0fa,
+      0 0 150px #0fa;
+  }
+  0% {
+    /* Smaller blur radius */
+    text-shadow:
+      0 0 2px #fff,
+      0 0 4px #fff,
+      0 0 6px #fff,
+      0 0 10px #0fa,
+      0 0 45px #0fa,
+      0 0 55px #0fa,
+      0 0 70px #0fa,
+      0 0 80px #0fa;
+  }
+}
+.neonText {
+  animation: pulsate 2.5s infinite alternate;
+}
+.grey {
+    color: #888
+}
+.dark {
+    color: #444
+}
+.small {
+    font-size: 13px
+}
+</style>
+
+<script>
+var loop = setInterval(()=>{
+    document.getElementById('duy').innerHTML = `Days until ${new Date().getFullYear()+1}:`
+    date = new Date(new Date().getFullYear()+1 + '-01-01')
+    offset = new Date().getTimezoneOffset()*60*1000
+    Dtime = date.getTime() + offset
+    days = (Dtime - Date.now())/(1000*60*60*24)
+    document.getElementById('days').innerHTML = days.toFixed(5)
+}, 1000)
+</script>
+
+
+<br>
+<h1 class="neonText2" id="duy">Days until [year]:</h1>
+<h1 class="big mono neonText" id="days">[days]</h1>
+<br>
+<br>
+<p class="grey">(In your timezone)</p>
+<br>
+<br>
+<br>
+<br>
+<p class="dark small">Made by Danidanijr#5913</p>
